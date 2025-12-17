@@ -171,20 +171,12 @@
             </button>
         </div>
 
-        <div class="setting-label">
-            <span>📳 Vibración (Bomba)</span>
-            <button class="setting-button" id="vibration-toggle" onclick="toggleVibration()">
-                Desactivar
-            </button>
-        </div>
-
         <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">Volver</button>
     </div>
     
     <div id="how-to-play-container" style="display: none;">
         <h2>❓ ¿Cómo se juega?</h2>
         <div class="info-content">
-            <p>¡Bienvenido a Extreme Treasures! El objetivo es **recolectar las riquezas y aumentar tu puntuación**, mientras evitas las trampas.</p>
             <p>¡Bienvenido a Extreme Treasures! El objetivo es recolectar las riquezas y aumentar tu puntuación, mientras evitas las trampas.</p>
             <br>
             <h3>Items Comunes:</h3>
@@ -205,20 +197,12 @@
     <div id="about-container" style="display: none;">
         <h2>✨ Acerca del juego</h2>
         <div class="info-content">
-            <p><strong>Versión 1.2</strong></p>
             <p>Creado por DX GAMES</p>
+            <p><strong>Versión: v1.2.5</strong></p>
             <br>
-            <h3>Registro de actualizaciones:</h3>
-            <p>• Versión 1.0</p>
-            <p>&nbsp;&nbsp;&nbsp; - ¡Se creó el juego!</p>
-            <p>• Versión 1.1</p>
-            <p>&nbsp;&nbsp;&nbsp; - Se añadieron dos nuevas canciones.</p>
-            <p>&nbsp;&nbsp;&nbsp; - Se agregó un sistema de récords persistente.</p>
-            <p>&nbsp;&nbsp;&nbsp; - Se agregó el menú "¿Como se juega?" con las reglas básicas y mecánicas del juego.</p>
-            <p>• Versión 1.2</p>
-            <p>&nbsp;&nbsp;&nbsp; - Eliminación de la etiqueta "BETA" y optimización de metadatos para compartir.</p>
-        </div>
-        <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">¡Gracias por jugar! (Volver)</button>
+            <p style="text-align: center;">¡Gracias por jugar!</p>
+            </div>
+        <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">Volver al menú</button>
     </div>
 
     <canvas id="gameCanvas" width="480" height="640" style="display: none;"></canvas>
@@ -279,15 +263,15 @@
         ];
         
         // --- CONSTANTE DE VERSIÓN ACTUALIZADA ---
-        const GAME_VERSION = "v1.2"; 
-
+        const GAME_VERSION = "v1.2.5"; 
+        
+        // SE ELIMINÓ settings.vibration
         let settings = {
-            sound: true, 
-            vibration: true
+            sound: true 
         };
         
         const soundToggleBtn = document.getElementById('sound-toggle');
-        const vibrationToggleBtn = document.getElementById('vibration-toggle');
+        // SE ELIMINÓ const vibrationToggleBtn
 
         function toggleSound() {
             settings.sound = !settings.sound;
@@ -302,17 +286,7 @@
             }
         }
         
-        function toggleVibration() {
-            settings.vibration = !settings.vibration;
-            vibrationToggleBtn.textContent = settings.vibration ? 'Desactivar' : 'Activar';
-            if (settings.vibration) vibrate(50);
-        }
-
-        function vibrate(duration) {
-            if (settings.vibration && navigator.vibrate) {
-                navigator.vibrate(duration);
-            }
-        }
+        // SE ELIMINARON las funciones toggleVibration() y vibrate()
         
         // --- GESTIÓN DE AUDIO (Efectos de sonido) ---
         const SOUNDS = {};
@@ -436,7 +410,7 @@
             hideAllMenus();
             settingsContainer.style.display = 'flex';
             soundToggleBtn.textContent = settings.sound ? 'Desactivar' : 'Activar';
-            vibrationToggleBtn.textContent = settings.vibration ? 'Desactivar' : 'Activar';
+            // SE ELIMINÓ: vibrationToggleBtn.textContent = settings.vibration ? 'Desactivar' : 'Activar';
         }
         
         // --- FUNCIÓN: MOSTRAR MENÚ DE MÚSICA ---
@@ -657,7 +631,7 @@
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.font = '14px Arial';
             ctx.textAlign = 'right';
-            ctx.fillText(GAME_VERSION, GAME_WIDTH - 10, GAME_HEIGHT - 10); 
+            ctx.fillText(`Versión: ${GAME_VERSION}`, GAME_WIDTH - 10, GAME_HEIGHT - 10); 
 
             // PANTALLA DE PAUSA
             if (gameState === 'PAUSED') {
@@ -839,7 +813,7 @@
                     else if (item.type.type === 'life_bad') {
                         bag.life += item.type.value; 
                         playSound('bomb');
-                        vibrate(200); 
+                        // SE ELIMINÓ vibrate(200);
                     }
                     
                     bag.score = Math.max(0, bag.score); 
