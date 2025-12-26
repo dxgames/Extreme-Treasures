@@ -16,9 +16,7 @@
     <style>
         /* CSS Básico para el Juego de Navegador */
         body { 
-            /* El JS controlará el background-image y background-position */
             background-color: #4b371c; /* Color de fallback */
-            
             margin: 0; 
             display: flex; 
             flex-direction: column;
@@ -41,14 +39,12 @@
             margin-bottom: 20px;
             letter-spacing: 5px; 
             text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
-            /* Ocultar por defecto, el JS lo controlará */
             display: none; 
         }
 
         canvas { 
             border: 5px solid #00ffff; 
-            /* Fondo de imagen del tablero */
-            background-image: url('https://i.postimg.cc/Px2chqKH/Tablero.png'); /* URL Actualizada */
+            background-image: url('https://i.postimg.cc/Px2chqKH/Tablero.png'); 
             background-size: cover; 
             background-repeat: no-repeat;
             background-position: center;
@@ -58,7 +54,6 @@
         }
         
         /* ESTILOS DEL MENÚ Y AJUSTES */
-        /* [AGREGADO] Menú Acerca de, Menú Como se Juega */
         #menu-container, #settings-container, #music-select-container, #how-to-play-container, #about-container { 
             position: absolute;
             top: 50%;
@@ -72,8 +67,8 @@
             flex-direction: column;
             align-items: center;
             min-width: 300px;
-            max-height: 90vh; /* Para pantallas pequeñas */
-            overflow-y: auto; /* Para pantallas pequeñas */
+            max-height: 90vh; 
+            overflow-y: auto; 
             z-index: 10;
         }
 
@@ -113,7 +108,6 @@
             color: white;
         }
         
-        /* Estilos específicos para el contenido de los nuevos menús */
         .info-content p {
             text-align: left;
             margin: 5px 0;
@@ -171,6 +165,13 @@
             </button>
         </div>
 
+        <div class="setting-label">
+            <span>📳 Vibración</span>
+            <button class="setting-button" id="vibration-toggle" onclick="toggleVibration()">
+                Desactivar
+            </button>
+        </div>
+
         <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">Volver</button>
     </div>
     
@@ -198,7 +199,7 @@
         <h2>✨ Acerca del juego</h2>
         <div class="info-content">
             <p>Creado por DX GAMES</p>
-            <p><strong>Versión: v1.2.5</strong></p>
+            <p><strong>Versión: v1.3 (Plus)</strong></p>
             <br>
             <p style="text-align: center;">¡Gracias por jugar!</p>
             </div>
@@ -219,6 +220,21 @@
         // --- 1. Inicialización del Canvas y Contexto ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const BASE_WIDTH = 480;
+        const BASE_HEIGHT = 640;
+
+        function resizeCanvas() {
+            const scale = Math.min(
+                window.innerWidth / BASE_WIDTH,
+                window.innerHeight / BASE_HEIGHT
+            );
+
+            canvas.style.width = BASE_WIDTH * scale + 'px';
+            canvas.style.height = BASE_HEIGHT * scale + 'px';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        
         const menuContainer = document.getElementById('menu-container');
         const settingsContainer = document.getElementById('settings-container');
         const musicSelectContainer = document.getElementById('music-select-container');
@@ -236,8 +252,8 @@
         bgmPlayer.volume = 0.3; 
         
         // --- CONSTANTES DE FONDO EXTERNO ---
-        const MENU_BG_IMAGE_URL = 'https://i.postimg.cc/hjpwgGMQ/Fondo_menuprincipal.png'; // URL Actualizada
-        const GAME_BG_IMAGE_URL = 'https://i.postimg.cc/TwCSGPQb/Fondo_juego.png'; // URL Actualizada
+        const MENU_BG_IMAGE_URL = 'https://i.postimg.cc/hjpwgGMQ/Fondo_menuprincipal.png';
+        const GAME_BG_IMAGE_URL = 'https://i.postimg.cc/TwCSGPQb/Fondo_juego.png';
 
 
         // --- INICIO: SECCIÓN DE AJUSTES Y ESTADO GLOBAL ---
@@ -263,20 +279,20 @@
         ];
         
         // --- CONSTANTE DE VERSIÓN ACTUALIZADA ---
-        const GAME_VERSION = "v1.2.5"; 
-        
-        // SE ELIMINÓ settings.vibration
+        const GAME_VERSION = "v1.3 (Plus)"; 
+
         let settings = {
-            sound: true 
+            sound: true,
+            vibration: true
         };
-        
+
         const soundToggleBtn = document.getElementById('sound-toggle');
-        // SE ELIMINÓ const vibrationToggleBtn
+        const vibrationToggleBtn = document.getElementById('vibration-toggle');
 
         function toggleSound() {
             settings.sound = !settings.sound;
             soundToggleBtn.textContent = settings.sound ? 'Desactivar' : 'Activar';
-            
+
             if ((gameState === 'PLAYING' || gameState === 'PAUSED') && audioStarted) {
                 if (settings.sound && gameState === 'PLAYING') {
                     playBGM();
@@ -285,8 +301,22 @@
                 }
             }
         }
-        
-        // SE ELIMINARON las funciones toggleVibration() y vibrate()
+
+        // --- VIBRACIÓN ---
+        function vibrate(ms) {
+            if (!settings.vibration) return;
+            if (navigator.vibrate) {
+                navigator.vibrate(ms);
+            }
+        }
+
+        function toggleVibration() {
+            settings.vibration = !settings.vibration;
+            vibrationToggleBtn.textContent = settings.vibration ? 'Desactivar' : 'Activar';
+            if (settings.vibration) {
+                vibrate(100);
+            }
+        }
         
         // --- GESTIÓN DE AUDIO (Efectos de sonido) ---
         const SOUNDS = {};
@@ -362,7 +392,6 @@
         }
 
         // --- FUNCIONES DE VISTA Y FONDO ---
-        // Funciòn para ocultar todos los menús
         function hideAllMenus() {
             menuContainer.style.display = 'none';
             settingsContainer.style.display = 'none';
@@ -395,9 +424,8 @@
             
             hideAllMenus();
             menuContainer.style.display = 'flex';
-            loadHighScore(); // Carga y muestra el récord en el menú
+            loadHighScore(); 
             
-            // Limpiar botones de música anteriores para evitar duplicados
             const buttonsToRemove = musicSelectContainer.querySelectorAll('.menu-button:not([onclick="showMainMenu()"])');
             buttonsToRemove.forEach(btn => btn.remove());
         }
@@ -410,10 +438,8 @@
             hideAllMenus();
             settingsContainer.style.display = 'flex';
             soundToggleBtn.textContent = settings.sound ? 'Desactivar' : 'Activar';
-            // SE ELIMINÓ: vibrationToggleBtn.textContent = settings.vibration ? 'Desactivar' : 'Activar';
         }
         
-        // --- FUNCIÓN: MOSTRAR MENÚ DE MÚSICA ---
         function showMusicSelectMenu() {
             gameState = 'MUSIC_SELECT';
             setMenuBackground(); 
@@ -422,10 +448,9 @@
             hideAllMenus();
             musicSelectContainer.style.display = 'flex';
 
-            // Generar botones de música
             const buttonsContainer = musicSelectContainer.querySelector('h2').nextElementSibling;
             if (buttonsContainer && buttonsContainer.tagName !== 'BUTTON') {
-                buttonsContainer.remove(); // Remueve botones viejos si existen
+                buttonsContainer.remove(); 
             }
 
             const optionsHtml = BGM_OPTIONS.map((option, index) => {
@@ -439,7 +464,6 @@
             musicSelectContainer.querySelector('h2').insertAdjacentHTML('afterend', `<div id="music-buttons-container">${optionsHtml}</div>`);
         }
         
-        // Menú "Cómo se juega"
         function showHowToPlayMenu() {
             gameState = 'INFO';
             setMenuBackground();
@@ -449,7 +473,6 @@
             howToPlayContainer.style.display = 'flex';
         }
 
-        // Menú "Acerca del juego"
         function showAboutMenu() {
             gameState = 'INFO';
             setMenuBackground();
@@ -459,14 +482,12 @@
             aboutContainer.style.display = 'flex';
         }
 
-        // --- FUNCIÓN: INICIAR JUEGO CON MÚSICA SELECCIONADA ---
         function playSelectedMusic(index) {
             currentBGMIndex = index;
             startGameLogic(); 
         }
 
 
-        // --- LA FUNCIÓN ORIGINAL "startGame" RENOMBRADA Y LLAMADA DESPUÉS DE LA MÚSICA ---
         function startGameLogic() {
             gameState = 'PLAYING';
             setGameBackground(); 
@@ -485,16 +506,11 @@
         
         // --- 1.5. Carga de Imagen de la Bolsa (Player) ---
         let bagImage = new Image();
-        const BAG_IMAGE_URL = 'https://i.postimg.cc/j5Z9KjvY/Bolsa.png'; // URL Actualizada
+        const BAG_IMAGE_URL = 'https://i.postimg.cc/j5Z9KjvY/Bolsa.png';
         bagImage.src = BAG_IMAGE_URL; 
 
-        bagImage.onload = () => {
-            console.log("Imagen de la bolsa cargada con éxito.");
-        };
-
-        bagImage.onerror = () => {
-            console.error("Error al cargar la imagen de la bolsa. Usando emoji de fallback. (Revisa la configuración de uso compartido)");
-        };
+        bagImage.onload = () => { console.log("Imagen de la bolsa cargada."); };
+        bagImage.onerror = () => { console.error("Error al cargar la imagen de la bolsa."); };
 
         // --- 2. Variables del Juego y la Bolsa (Player) ---
         const BAG_WIDTH = 60; 
@@ -542,7 +558,7 @@
         // --- 5. Variables de Entrada y Estado ---
         let rightPressed = false;
         let leftPressed = false;
-        let bagMoveTargetX = null; 
+        let bagMoveTargetX = null; // Mantenemos la variable pero ya no la usamos para target
         let gameLoopId;
 
 
@@ -554,7 +570,6 @@
         function drawBag() {
             ctx.save();
             ctx.globalAlpha = 1.0; 
-
             if (bagImage.complete && bagImage.naturalWidth !== 0) {
                 ctx.drawImage(bagImage, bag.x, bag.y, BAG_WIDTH, BAG_HEIGHT);
             } else {
@@ -562,7 +577,6 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('💰', bag.x + BAG_WIDTH / 2, bag.y + BAG_HEIGHT - 5);
             }
-            
             ctx.restore(); 
         }
 
@@ -597,7 +611,6 @@
             
             ctx.fillStyle = (bag.life <= 1) ? '#ff0000' : '#00cc00'; 
             ctx.fillRect(barX, barY, currentLifeW, barH);
-            
             ctx.strokeStyle = 'white'; ctx.strokeRect(barX, barY, barW, barH);
 
             ctx.fillStyle = 'white';
@@ -605,7 +618,6 @@
             ctx.textAlign = 'left';
             ctx.fillText(`Nivel: ${currentLevel}`, 10, 30); 
             ctx.fillText(`Puntos: ${bag.score}`, 10, 60); 
-            // Mostrar el Récord
             ctx.fillText(`Récord: ${highScore}`, 10, 90); 
             ctx.fillText(`HP: ${bag.life}/${MAX_LIFE}`, barX + barW + 10, barY + 16);
             
@@ -627,13 +639,11 @@
         function drawHUD() {
             drawLifeBar();
 
-            // Dibujar la versión del juego (v1.2)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.font = '14px Arial';
             ctx.textAlign = 'right';
             ctx.fillText(`Versión: ${GAME_VERSION}`, GAME_WIDTH - 10, GAME_HEIGHT - 10); 
 
-            // PANTALLA DE PAUSA
             if (gameState === 'PAUSED') {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                 ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -648,8 +658,6 @@
             if (gameState === 'GAMEOVER') {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
                 ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-                
-                // Guardar récord si se supera
                 saveHighScore(); 
                 
                 ctx.fillStyle = 'white';
@@ -671,14 +679,11 @@
         function calculateSpeed() {
             const speedMultiplier = 1 + (currentLevel - 1) * SPEED_INCREASE_RATE;
             let finalMultiplier = speedMultiplier;
-            
             if (isFrenzyActive || isTrapActive) {
                 finalMultiplier *= MODE_SPEED_BOOST; 
             }
-            
             const minSpeed = BASE_SPEED * finalMultiplier;
             const maxSpeed = (BASE_SPEED + 2) * finalMultiplier; 
-
             return { minSpeed, maxSpeed };
         }
 
@@ -702,45 +707,29 @@
 
         function spawnItem() {
             let typeToSpawn;
-            
             if (isFrenzyActive) {
-                const frenzyWeights = {
-                    GOLD_COIN: 5, DIAMOND: 50, MONEY_NOTE: 5, HEART: 1,
-                };
+                const frenzyWeights = { GOLD_COIN: 5, DIAMOND: 50, MONEY_NOTE: 5, HEART: 1 };
                 const frenzyTotalWeight = Object.values(frenzyWeights).reduce((sum, weight) => sum + weight, 0);
                 let randomNum = Math.random() * frenzyTotalWeight;
                 for (const key in frenzyWeights) {
                     randomNum -= frenzyWeights[key];
-                    if (randomNum <= 0) {
-                        typeToSpawn = ITEM_TYPES[key];
-                        break;
-                    }
+                    if (randomNum <= 0) { typeToSpawn = ITEM_TYPES[key]; break; }
                 }
             } else if (isTrapActive) {
-                 // Modo Trampa: Solo Bombas y Dinero con Alas
-                const trapWeights = {
-                    BOMB: 10, MONEY_WINGS: 5,
-                };
+                const trapWeights = { BOMB: 10, MONEY_WINGS: 5 };
                 const trapTotalWeight = Object.values(trapWeights).reduce((sum, weight) => sum + weight, 0);
                 let randomNum = Math.random() * trapTotalWeight;
                 for (const key in trapWeights) {
                     randomNum -= trapWeights[key];
-                    if (randomNum <= 0) {
-                        typeToSpawn = ITEM_TYPES[key];
-                        break;
-                    }
+                    if (randomNum <= 0) { typeToSpawn = ITEM_TYPES[key]; break; }
                 }
             } else {
                 let randomNum = Math.random() * totalWeight;
                 for (const key in ITEM_TYPES) {
                     randomNum -= ITEM_TYPES[key].weight;
-                    if (randomNum <= 0) {
-                        typeToSpawn = ITEM_TYPES[key];
-                        break;
-                    }
+                    if (randomNum <= 0) { typeToSpawn = ITEM_TYPES[key]; break; }
                 }
             }
-            
             if (!typeToSpawn) return; 
 
             const x = Math.random() * (GAME_WIDTH - ITEM_SIZE);
@@ -753,7 +742,6 @@
         function update() {
             if (gameState !== 'PLAYING') return; 
 
-            // Lógica de FIN de Modos (Frenesí o Trampa)
             if (isFrenzyActive || isTrapActive) {
                 if (Date.now() > modeEndTime) {
                     isFrenzyActive = false;
@@ -762,14 +750,13 @@
                 }
             }
 
-            // Movimiento de la bolsa
+            // --- MOVIMIENTO DE LA BOLSA (FIXED PLUS) ---
             if (rightPressed) { bag.x += BAG_SPEED; } 
             else if (leftPressed) { bag.x -= BAG_SPEED; }
-            if (bagMoveTargetX !== null) {
-                const dx = bagMoveTargetX - bag.x;
-                if (Math.abs(dx) > BAG_SPEED) { bag.x += Math.sign(dx) * BAG_SPEED; } 
-                else { bag.x = bagMoveTargetX; }
-            }
+            
+            // Eliminado el código de "persecución" (bagMoveTargetX)
+            // para usar movimiento directo en los eventos táctiles.
+
             bag.x = Math.max(0, Math.min(bag.x, GAME_WIDTH - BAG_WIDTH));
             bag.life = Math.min(bag.life, MAX_LIFE);
 
@@ -788,7 +775,6 @@
                 item.y += item.speed;
 
                 if (checkCollision(bag, item)) {
-                    
                     if (item.type.type === 'powerup') {
                         isFrenzyActive = true;
                         isTrapActive = false;
@@ -800,6 +786,7 @@
                         isFrenzyActive = false; 
                         modeEndTime = Date.now() + MODE_DURATION;
                         playSound('bomb'); 
+                        vibrate(400); 
                     }
                     else if (item.type.type === 'good' || item.type.type === 'bad') {
                         bag.score += item.type.value;
@@ -813,7 +800,7 @@
                     else if (item.type.type === 'life_bad') {
                         bag.life += item.type.value; 
                         playSound('bomb');
-                        // SE ELIMINÓ vibrate(200);
+                        vibrate(200);
                     }
                     
                     bag.score = Math.max(0, bag.score); 
@@ -824,7 +811,6 @@
                 }
             }
 
-            // Verificar si el juego ha terminado
             if (bag.life <= 0) {
                 bag.life = 0; 
                 gameState = 'GAMEOVER';
@@ -852,7 +838,6 @@
         // --- 9. Manejo de Entrada (Teclado y Táctil) ---
 
         document.addEventListener('keydown', (e) => {
-            
             if (gameState === 'PLAYING' || gameState === 'PAUSED') {
                 if (e.key === ' ' || e.key.toLowerCase() === 'p') {
                     e.preventDefault(); 
@@ -860,18 +845,15 @@
                     return;
                 }
             }
-            
             if (gameState === 'GAMEOVER' && e.key.toLowerCase() === 'r') {
                 showMainMenu();
                 return;
             }
-            
             if (gameState === 'PLAYING') {
                 if (!audioStarted) {
                     playBGM();
                     audioStarted = true;
                 }
-                
                 if (e.key === 'Right' || e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
                     rightPressed = true;
                 } else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
@@ -890,8 +872,14 @@
             }
         });
 
+        // --- FUNCIONES TÁCTILES MEJORADAS (PLUS FIX) ---
         function getTouchX(e) {
-            return e.touches[0].clientX - canvasRect.left;
+            // Recalculamos el rectángulo por si hubo scroll o cambio de tamaño
+            canvasRect = canvas.getBoundingClientRect(); 
+            // Factor de escala: Relación entre resolución interna (480) y tamaño en pantalla
+            const scaleX = canvas.width / canvasRect.width;
+            // Obtenemos la posición X relativa al canvas y aplicamos la escala
+            return (e.touches[0].clientX - canvasRect.left) * scaleX;
         }
 
         canvas.addEventListener('touchstart', (e) => {
@@ -901,28 +889,31 @@
                 showMainMenu();
                 return;
             }
-            
             if (gameState === 'PAUSED') { 
                 togglePause();
                 return;
             }
-
             if (gameState === 'PLAYING') {
                 if (!audioStarted) {
                     playBGM();
                     audioStarted = true;
                 }
-                
+                // MOVIMIENTO INSTANTÁNEO
                 const touchX = getTouchX(e);
-                bagMoveTargetX = touchX - (BAG_WIDTH / 2);
+                bag.x = touchX - (BAG_WIDTH / 2);
+                bag.x = Math.max(0, Math.min(bag.x, GAME_WIDTH - BAG_WIDTH));
+                
+                bagMoveTargetX = null; 
             }
         });
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             if (gameState === 'PLAYING') {
+                // SEGUIMIENTO 1:1
                 const touchX = getTouchX(e);
-                bagMoveTargetX = touchX - (BAG_WIDTH / 2);
+                bag.x = touchX - (BAG_WIDTH / 2);
+                bag.x = Math.max(0, Math.min(bag.x, GAME_WIDTH - BAG_WIDTH));
             }
         });
 
@@ -949,6 +940,7 @@
         function initGame() {
             if (!canvas || !ctx) return; 
             canvasRect = canvas.getBoundingClientRect(); 
+            resizeCanvas();
             loadHighScore(); 
             showMainMenu();
             if (!gameLoopId) {
