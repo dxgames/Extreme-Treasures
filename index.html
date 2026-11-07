@@ -54,7 +54,7 @@
         }
         
         /* ESTILOS DEL MENÚ Y AJUSTES */
-        #menu-container, #settings-container, #music-select-container, #how-to-play-container, #about-container, #store-container, #store-music-popup, #pause-menu, #game-over-menu { 
+        #menu-container, #settings-container, #music-select-container, #how-to-play-container, #about-container, #store-container, #store-music-popup, #pause-menu, #game-over-menu, #records-container { 
             position: absolute;
             top: 50%;
             left: 50%;
@@ -72,7 +72,6 @@
             z-index: 10;
         }
 
-        /* El popup debe estar por encima del store normal */
         #store-music-popup {
             z-index: 15;
             border: 1px solid #ffcc00; 
@@ -127,40 +126,6 @@
         #store-btn-main:hover { transform: scale(1.1); }
         #store-btn-main span.emoji { font-size: 30px; }
         #store-btn-main span.text { font-size: 10px; font-weight: bold; color: black; margin-top: -2px; }
-
-        /* --- BOTÓN DONAR (DERECHA) --- */
-        #donate-btn-main {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: #ffcc00;
-            border: 3px solid #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
-            transition: transform 0.2s;
-            z-index: 20;
-        }
-
-        #donate-btn-main:hover { transform: scale(1.1); }
-        
-        .icon-img-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 2px;
-            border: 1px solid #000;
-        }
-        
-        #donate-btn-main span.text { font-size: 10px; font-weight: bold; color: black; margin-top: 2px; }
-
 
         /* Estilos lista tienda */
         .store-item {
@@ -241,9 +206,7 @@
             transition: transform 0.2s;
         }
 
-        .social-btn:hover {
-            transform: scale(1.1);
-        }
+        .social-btn:hover { transform: scale(1.1); }
 
         .social-btn img {
             width: 50px;
@@ -278,9 +241,20 @@
             transition: background-color 0.1s;
             line-height: 1; 
         }
-        #pause-button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
+        #pause-button:hover { background-color: rgba(255, 255, 255, 0.4); }
+
+        /* --- ANIMACIONES Y ESTILOS RÉCORDS --- */
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
         }
+        .record-list { list-style: none; padding: 0; width: 100%; text-align: center; color: white;}
+        .record-list li { margin: 10px 0; font-size: 1.2em; border-bottom: 1px solid #444; padding-bottom: 5px;}
+        .record-list li:nth-child(1) { color: #ffd700; font-weight: bold; font-size: 1.4em;}
+        .record-list li:nth-child(2) { color: #c0c0c0; font-weight: bold; font-size: 1.3em;}
+        .record-list li:nth-child(3) { color: #cd7f32; font-weight: bold; font-size: 1.2em;}
+
     </style>
 </head>
 <body>
@@ -292,19 +266,23 @@
         <span class="text">TIENDA</span>
     </div>
 
-    <div id="donate-btn-main" onclick="donateAction()" style="display: none;">
-        <img src="https://i.postimg.cc/zfLzw2Mv/channels4_profile.jpg" alt="Donar" class="icon-img-btn">
-        <span class="text">DONAR :)</span>
-    </div>
-
     <div id="menu-container">
         <h2>Menú Principal</h2>
         <div id="wallet-display">💰 Coins: 0</div>
         <button class="menu-button" onclick="showMusicSelectMenu()">Jugar</button> 
+        <button class="menu-button" onclick="showStoreMenu()">Tienda</button>
+        <button class="menu-button" onclick="showRecordsMenu()">Récords</button>
         <button class="menu-button" onclick="showSettings()">Ajustes</button>
         <button class="menu-button" onclick="showHowToPlayMenu()">Como se juega</button>
         <button class="menu-button" onclick="showAboutMenu()">Acerca del juego</button>
         <p id="high-score-display" style="margin-top: 15px; font-size: 1.1em; color: #ffcc00;"></p>
+    </div>
+
+    <div id="records-container" style="display: none;">
+        <h2>🏆 MEJORES RÉCORDS 🏆</h2>
+        <ul id="records-list" class="record-list">
+        </ul>
+        <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">Volver</button>
     </div>
 
     <div id="pause-menu" style="display: none;">
@@ -315,6 +293,7 @@
 
     <div id="game-over-menu" style="display: none;">
         <h2>¡Juego Terminado!</h2>
+        <h3 id="new-record-msg" style="display: none; color: #00ff00; text-shadow: 0 0 10px #00ff00; margin: 10px 0; animation: blink 1s infinite;">¡NUEVO RÉCORD!</h3>
         <p id="go-score" style="color: white; font-size: 1.2em; margin: 10px 0;">Puntuación: 0</p>
         <p id="go-coins" style="color: #ffcc00; font-size: 1.1em; margin-bottom: 20px;">Coins Totales: 0</p>
         
@@ -337,8 +316,7 @@
         <h2>🎵 Catálogo Musical</h2>
         <div id="store-wallet-display-popup">💰 Tus Coins: 0</div>
         
-        <div id="store-music-list" style="width: 100%; margin-bottom: 15px;">
-            </div>
+        <div id="store-music-list" style="width: 100%; margin-bottom: 15px;"></div>
         
         <p style="color: #888; font-style: italic; margin-top: 10px;">¡MÁS CANCIONES PRÓXIMAMENTE!</p>
         
@@ -378,14 +356,15 @@
             <h3>Items Comunes:</h3>
             <p>💵 Billetes: Puntaje base (+20). Común.</p>
             <p>🪙 Moneda de oro: Puntaje medio (+50). Raro.</p>
-            <p>💎 Diamante: ¡El tesoro más valioso! (+1000). Muy raro.</p>
-            <p>💰 Saco de Monedas: Vale 100 Coins para la TIENDA. (Muy raro).</p> <p>❤️ Corazón: Restaura una vida (+1 HP).</p>
+            <p>💎 Diamante: ¡El tesoro más valioso! (+1000). Extremadamente raro.</p>
+            <p>💰 Saco de Monedas: Vale 100 Coins para la TIENDA. (Más frecuente).</p> 
+            <p>❤️ Corazón: Restaura una vida (+1 HP).</p>
             <p>💸 Dinero con alas: Resta puntos (-20).</p>
             <p>💣 Bombas: Peligro. Resta una vida (-1 HP).</p>
             <br>
             <h3>Potenciadores y Trampas:</h3>
-            <p>⭐ Estrella (SÚPER FRENESÍ): Activa el modo Frenesí. La velocidad aumenta drásticamente y solo aparecen items de valor durante 10 segundos.</p>
-            <p>👹 Diablo (TRAMPA DEMONÍACA): Activa el modo Trampa. La velocidad aumenta drásticamente y solo aparecen bombas y dinero con alas durante 10 segundos.</p>
+            <p>⭐ Estrella (SÚPER FRENESÍ): Activa el modo Frenesí. Caen múltiples tesoros en cascada durante 10 segundos.</p>
+            <p>👹 Diablo (TRAMPA DEMONÍACA): Activa el modo Trampa. Caen múltiples bombas y dinero con alas en cascada durante 10 segundos.</p>
         </div>
         <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">Volver al menú</button>
     </div>
@@ -396,6 +375,11 @@
             <p>Creado por DX GAMES</p>
             <p><strong>Versión: v1.0.0</strong></p> 
             <br>
+            
+            <h3 style="color: #ffcc00; text-align: center; margin-bottom: 5px;">Registro de cambios</h3>
+            <ul style="text-align: left; font-size: 0.95em; padding-left: 20px;">
+                <li>v1.0.0: Lanzamiento del juego.</li>
+            </ul>
             
             <h3 class="social-section-title">SÍGUENOS</h3>
             
@@ -451,13 +435,15 @@
         const aboutContainer = document.getElementById('about-container'); 
         const storeContainer = document.getElementById('store-container'); 
         const storeMusicPopup = document.getElementById('store-music-popup'); 
-        const pauseMenu = document.getElementById('pause-menu'); // Referencia al menú de pausa
-        const gameOverMenu = document.getElementById('game-over-menu'); // Referencia al menú de Game Over
+        const pauseMenu = document.getElementById('pause-menu');
+        const gameOverMenu = document.getElementById('game-over-menu'); 
+        const recordsContainer = document.getElementById('records-container');
+        
         const pauseButton = document.getElementById('pause-button'); 
         const gameTitleText = document.getElementById('game-title-text'); 
         const highScoreDisplay = document.getElementById('high-score-display'); 
         const storeBtnMain = document.getElementById('store-btn-main'); 
-        const donateBtnMain = document.getElementById('donate-btn-main');
+        
         const walletDisplay = document.getElementById('wallet-display');
         const storeWalletDisplay = document.getElementById('store-wallet-display');
         const storeWalletDisplayPopup = document.getElementById('store-wallet-display-popup'); 
@@ -476,28 +462,48 @@
         let gameState = 'MENU'; 
         let audioStarted = false; 
         let highScore = 0; 
+        let topRecords = [50000, 30000, 15000, 0, 0, 0, 0, 0];
         
         // --- SISTEMA DE ECONOMÍA ---
         let playerCoins = 0;
         let unlockedMusicIds = [0, 6]; 
+        
+        let settings = { sound: true, vibration: true };
 
         function loadUserData() {
-            const storedScore = localStorage.getItem('extremeTreasuresHighScore');
-            highScore = storedScore ? parseInt(storedScore, 10) : 0;
+            const storedRecords = localStorage.getItem('dxGamesRecords');
+            if (storedRecords) {
+                topRecords = JSON.parse(storedRecords);
+                highScore = topRecords[0];
+            } else {
+                const legacyScore = localStorage.getItem('extremeTreasuresHighScore');
+                if (legacyScore) {
+                    topRecords.push(parseInt(legacyScore, 10));
+                    topRecords.sort((a,b) => b - a);
+                    topRecords = topRecords.slice(0, 8);
+                    highScore = topRecords[0];
+                } else {
+                    highScore = topRecords[0];
+                }
+            }
             highScoreDisplay.textContent = `Récord: ${highScore}`;
+
+            const storedSettings = localStorage.getItem('dxGamesSettings');
+            if(storedSettings) {
+                settings = JSON.parse(storedSettings);
+                document.getElementById('sound-toggle').textContent = settings.sound ? 'Desactivar' : 'Activar';
+                document.getElementById('vibration-toggle').textContent = settings.vibration ? 'Desactivar' : 'Activar';
+            }
 
             const storedCoins = localStorage.getItem('dxGamesCoins');
             playerCoins = storedCoins ? parseInt(storedCoins, 10) : 0;
             
-            // Actualizar todos los displays de monedas
             walletDisplay.textContent = `💰 Coins: ${playerCoins}`;
             storeWalletDisplay.textContent = `💰 Tus Coins: ${playerCoins}`;
             storeWalletDisplayPopup.textContent = `💰 Tus Coins: ${playerCoins}`;
 
             const storedMusic = localStorage.getItem('dxGamesUnlockedMusic');
-            if (storedMusic) {
-                unlockedMusicIds = JSON.parse(storedMusic);
-            }
+            if (storedMusic) unlockedMusicIds = JSON.parse(storedMusic);
         }
 
         function saveUserData() {
@@ -509,11 +515,17 @@
             storeWalletDisplayPopup.textContent = `💰 Tus Coins: ${playerCoins}`;
         }
 
-        function saveHighScore() {
-            if (bag.score > highScore) {
-                highScore = bag.score;
-                localStorage.setItem('extremeTreasuresHighScore', highScore.toString());
-            }
+        function saveSettingsData() {
+            localStorage.setItem('dxGamesSettings', JSON.stringify(settings));
+        }
+
+        function checkAndSaveRecord(score) {
+            topRecords.push(score);
+            topRecords.sort((a,b) => b - a);
+            topRecords = topRecords.slice(0, 8);
+            localStorage.setItem('dxGamesRecords', JSON.stringify(topRecords));
+            highScore = topRecords[0];
+            localStorage.setItem('extremeTreasuresHighScore', highScore.toString());
         }
 
         // --- DATOS DE MÚSICA ---
@@ -528,17 +540,17 @@
             { id: 6, name: "Sin Música (🔇)", url: null, price: 0 }
         ];
         
-        const GAME_VERSION = "v1.4 (Plus)"; 
+        const GAME_VERSION = "v1.0.0"; 
 
-        let settings = { sound: true, vibration: true };
         const soundToggleBtn = document.getElementById('sound-toggle');
         const vibrationToggleBtn = document.getElementById('vibration-toggle');
 
         function toggleSound() {
             settings.sound = !settings.sound;
             soundToggleBtn.textContent = settings.sound ? 'Desactivar' : 'Activar';
+            saveSettingsData();
             if ((gameState === 'PLAYING' || gameState === 'PAUSED') && audioStarted) {
-                if (settings.sound && gameState === 'PLAYING') playBGM(); else stopBGM();
+                if (settings.sound && gameState === 'PLAYING') resumeBGM(); else pauseBGM();
             }
         }
         function vibrate(ms) {
@@ -548,6 +560,7 @@
         function toggleVibration() {
             settings.vibration = !settings.vibration;
             vibrationToggleBtn.textContent = settings.vibration ? 'Desactivar' : 'Activar';
+            saveSettingsData();
             if (settings.vibration) vibrate(100);
         }
         
@@ -583,17 +596,25 @@
             bgmPlayer.pause();
             bgmPlayer.currentTime = 0;
         }
+        function pauseBGM() {
+            bgmPlayer.pause();
+        }
+        function resumeBGM() {
+            if (settings.sound && BGM_OPTIONS[currentBGMIndex].url) {
+                bgmPlayer.play().catch(e => { console.log("Error BGM:", e); });
+            }
+        }
         loadAudio();
 
         function togglePause() {
             if (gameState === 'PLAYING') {
                 gameState = 'PAUSED';
-                stopBGM(); 
-                pauseMenu.style.display = 'flex'; // Mostrar menú de pausa HTML
+                pauseBGM(); 
+                pauseMenu.style.display = 'flex'; 
             } else if (gameState === 'PAUSED') {
                 gameState = 'PLAYING';
-                playBGM();
-                pauseMenu.style.display = 'none'; // Ocultar menú de pausa HTML
+                resumeBGM();
+                pauseMenu.style.display = 'none'; 
             }
         }
 
@@ -608,11 +629,11 @@
             storeMusicPopup.style.display = 'none'; 
             pauseMenu.style.display = 'none';
             gameOverMenu.style.display = 'none';
+            recordsContainer.style.display = 'none';
             
             canvas.style.display = 'none';
             pauseButton.style.display = 'none'; 
             storeBtnMain.style.display = 'none'; 
-            donateBtnMain.style.display = 'none'; 
         }
 
         function setMenuBackground() {
@@ -630,6 +651,11 @@
         }
 
         function showMainMenu() {
+            if (gameState === 'PLAYING' || gameState === 'PAUSED') {
+                checkAndSaveRecord(bag.score);
+                saveUserData();
+            }
+            
             gameState = 'MENU';
             stopBGM(); 
             setMenuBackground(); 
@@ -638,16 +664,11 @@
             hideAllMenus();
             menuContainer.style.display = 'flex';
             storeBtnMain.style.display = 'flex'; 
-            donateBtnMain.style.display = 'flex'; 
             
             loadUserData(); 
             
             const buttonsToRemove = musicSelectContainer.querySelectorAll('.menu-button:not([onclick="showMainMenu()"])');
             buttonsToRemove.forEach(btn => btn.remove());
-        }
-        
-        function donateAction() {
-            alert('¡Gracias por tu interés en apoyar a DX GAMES! (Enlace de donación próximamente)');
         }
 
         // --- LÓGICA DE TIENDA Y POPUP ---
@@ -712,6 +733,29 @@
             } else {
                 alert("No tienes suficientes Coins. ¡Juega más para ganar!");
             }
+        }
+
+        // --- MENU RÉCORDS ---
+        function showRecordsMenu() {
+            gameState = 'RECORDS';
+            setMenuBackground();
+            gameTitleText.style.display = 'block';
+            hideAllMenus();
+            
+            const list = document.getElementById('records-list');
+            list.innerHTML = '';
+            
+            topRecords.forEach((score, index) => {
+                const li = document.createElement('li');
+                let prefix = `${index + 1}.`;
+                if(index === 0) prefix = '🥇';
+                if(index === 1) prefix = '🥈';
+                if(index === 2) prefix = '🥉';
+                li.textContent = `${prefix} ${score} pts`;
+                list.appendChild(li);
+            });
+            
+            recordsContainer.style.display = 'flex';
         }
 
         function showSettings() {
@@ -785,14 +829,21 @@
         function showGameOver() {
             gameState = 'GAMEOVER';
             stopBGM();
-            saveHighScore(); 
+            
+            let isNewRecord = (bag.score > highScore && bag.score > 0);
+            if (isNewRecord) {
+                document.getElementById('new-record-msg').style.display = 'block';
+            } else {
+                document.getElementById('new-record-msg').style.display = 'none';
+            }
+            
+            checkAndSaveRecord(bag.score); 
             saveUserData();
             
-            // Llenar datos del menú de Game Over
             document.getElementById('go-score').textContent = `Puntuación: ${bag.score}`;
             document.getElementById('go-coins').textContent = `Coins Totales: ${playerCoins}`;
             
-            gameOverMenu.style.display = 'flex'; // Mostrar menú HTML
+            gameOverMenu.style.display = 'flex'; 
             pauseButton.style.display = 'none';
         }
         
@@ -804,7 +855,6 @@
         // --- 2. Variables del Juego ---
         const BAG_WIDTH = 60; 
         const BAG_HEIGHT = 60; 
-        const BAG_SPEED = 7;   
         const MAX_LIFE = 5; 
         let bag = {
             x: (GAME_WIDTH / 2) - (BAG_WIDTH / 2),
@@ -833,8 +883,8 @@
         const ITEM_TYPES = {
             MONEY_NOTE: { emoji: '💵', value: 20, type: 'good', weight: 8 },
             GOLD_COIN: { emoji: '🪙', value: 50, type: 'good', weight: 4 },
-            DIAMOND: { emoji: '💎', value: 1000, type: 'good', weight: 0.5 }, 
-            STORE_COIN: { emoji: '💰', value: 0, type: 'currency', weight: 0.2 }, 
+            DIAMOND: { emoji: '💎', value: 1000, type: 'good', weight: 0.05 }, /* Diamante MUCHO más escaso */
+            STORE_COIN: { emoji: '💰', value: 0, type: 'currency', weight: 0.4 }, /* Saco de monedas aumentado un poquito */
 
             HEART: { emoji: '❤️', value: 1, type: 'bonus', weight: 1 },
             POWERUP_FRENZY: { emoji: '⭐', value: 0, type: 'powerup', weight: 0.2 }, 
@@ -844,8 +894,6 @@
         };
         const totalWeight = Object.values(ITEM_TYPES).reduce((sum, type) => sum + type.weight, 0);
 
-        let rightPressed = false;
-        let leftPressed = false;
         let gameLoopId;
 
         // --- 6. Funciones de Dibujo ---
@@ -865,9 +913,15 @@
 
         function drawItems() {
             ctx.save(); 
-            ctx.globalAlpha = 1.0; ctx.shadowColor = 'black'; ctx.shadowBlur = 5; ctx.fillStyle = 'white'; 
+            ctx.globalAlpha = 1.0; 
+            ctx.shadowColor = 'black'; 
+            ctx.shadowBlur = 5; 
+            ctx.fillStyle = 'white'; 
+            
+            ctx.font = `${ITEM_SIZE}px Arial`; 
+            ctx.textAlign = 'center';
+            
             items.forEach(item => {
-                ctx.font = `${ITEM_SIZE}px Arial`; ctx.textAlign = 'center';
                 ctx.fillText(item.type.emoji, item.x + ITEM_SIZE / 2, item.y + ITEM_SIZE - 5);
             });
             ctx.restore(); 
@@ -880,7 +934,8 @@
             const barH = 20;
             
             ctx.fillStyle = '#444'; ctx.fillRect(barX, barY, barW, barH);
-            const lifeRatio = bag.life / MAX_LIFE;
+            
+            const lifeRatio = Math.max(0, Math.min(1, bag.life / MAX_LIFE));
             ctx.fillStyle = (bag.life <= 1) ? '#ff0000' : '#00cc00'; 
             ctx.fillRect(barX, barY, barW * lifeRatio, barH);
             ctx.strokeStyle = 'white'; ctx.strokeRect(barX, barY, barW, barH);
@@ -890,7 +945,6 @@
             ctx.textAlign = 'left';
             ctx.fillText(`Nivel: ${currentLevel}`, 10, 30); 
             
-            // --- CAMBIO: Mostrar el récord en tiempo real ---
             let displayHighScore = Math.max(highScore, bag.score);
             ctx.fillText(`Récord: ${displayHighScore}`, 10, 50); 
             
@@ -907,12 +961,6 @@
                 ctx.fillText(`¡TRAMPA DEMONÍACA! 👹 ${time}s`, GAME_WIDTH / 2, 45);
             }
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = '14px Arial'; ctx.textAlign = 'right';
-            ctx.fillText(`Versión: ${GAME_VERSION}`, GAME_WIDTH - 10, GAME_HEIGHT - 10); 
-
-            // Se han eliminado los textos de "PAUSA" y "GAMEOVER" del canvas 
-            // ya que ahora se usan menús HTML
             if (gameState === 'PAUSED') {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
             }
@@ -939,10 +987,11 @@
                 bag.y < objB.y + ITEM_SIZE && bag.y + BAG_HEIGHT > objB.y;
         }
 
-        function spawnItem() {
+        function spawnItem(isCascade = false) {
             let typeToSpawn;
             if (isFrenzyActive) {
-                const frenzyWeights = { GOLD_COIN: 5, DIAMOND: 50, MONEY_NOTE: 5, HEART: 1, STORE_COIN: 0.05 }; 
+                // Frenesí: Pesos ajustados para que el diamante sea súper escaso y aparezcan más monedas/billetes/sacos
+                const frenzyWeights = { GOLD_COIN: 6, MONEY_NOTE: 6, STORE_COIN: 0.8, DIAMOND: 0.1, HEART: 1 }; 
                 let randomNum = Math.random() * Object.values(frenzyWeights).reduce((a, b) => a + b, 0);
                 for (const key in frenzyWeights) {
                     randomNum -= frenzyWeights[key];
@@ -967,7 +1016,10 @@
             const x = Math.random() * (GAME_WIDTH - ITEM_SIZE);
             const { minSpeed, maxSpeed } = calculateSpeed();
             const speed = minSpeed + (Math.random() * (maxSpeed - minSpeed));
-            items.push({ x: x, y: -ITEM_SIZE, speed: speed, type: typeToSpawn });
+            
+            const y = -ITEM_SIZE - (isCascade ? (Math.random() * 150) : 0);
+            
+            items.push({ x: x, y: y, speed: speed, type: typeToSpawn });
         }
 
         function update() {
@@ -975,14 +1027,19 @@
             if (isFrenzyActive || isTrapActive) {
                 if (Date.now() > modeEndTime) { isFrenzyActive = false; isTrapActive = false; modeEndTime = 0; }
             }
-            if (rightPressed) bag.x += BAG_SPEED; 
-            else if (leftPressed) bag.x -= BAG_SPEED;
-            bag.x = Math.max(0, Math.min(bag.x, GAME_WIDTH - BAG_WIDTH));
+            
             bag.life = Math.min(bag.life, MAX_LIFE);
 
             itemSpawnCounter++;
-            const currentSpawnRate = (isFrenzyActive || isTrapActive) ? 30 : itemSpawnRate; 
-            if (itemSpawnCounter >= currentSpawnRate) { spawnItem(); itemSpawnCounter = 0; }
+            const currentSpawnRate = (isFrenzyActive || isTrapActive) ? 15 : itemSpawnRate; 
+            
+            if (itemSpawnCounter >= currentSpawnRate) { 
+                let spawns = (isFrenzyActive || isTrapActive) ? Math.floor(Math.random() * 3) + 3 : 1; 
+                for(let i=0; i < spawns; i++) {
+                    spawnItem(isFrenzyActive || isTrapActive); 
+                }
+                itemSpawnCounter = 0; 
+            }
 
             for (let i = items.length - 1; i >= 0; i--) {
                 let item = items[i];
@@ -1021,7 +1078,7 @@
 
             if (bag.life <= 0) { 
                 bag.life = 0; 
-                showGameOver(); // Llamamos a la nueva función
+                showGameOver(); 
             }
         }
 
@@ -1033,25 +1090,6 @@
             audioStarted = false; loadUserData(); 
         }
 
-        document.addEventListener('keydown', (e) => {
-            if (gameState === 'PLAYING' || gameState === 'PAUSED') {
-                if (e.key === ' ' || e.key.toLowerCase() === 'p') { e.preventDefault(); togglePause(); return; }
-            }
-            // Se eliminó la tecla 'R' para reiniciar, ahora es por botón
-            if (gameState === 'PLAYING') {
-                if (!audioStarted) { playBGM(); audioStarted = true; }
-                if (e.key === 'Right' || e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') rightPressed = true;
-                else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') leftPressed = true;
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            if (gameState === 'PLAYING') {
-                if (e.key === 'Right' || e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') rightPressed = false;
-                else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') leftPressed = false;
-            }
-        });
-
         function getTouchX(e) {
             canvasRect = canvas.getBoundingClientRect(); 
             const scaleX = canvas.width / canvasRect.width;
@@ -1060,7 +1098,6 @@
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); 
-            // Eliminada la lógica de tocar para despausar/reiniciar
             if (gameState === 'PLAYING') {
                 if (!audioStarted) { playBGM(); audioStarted = true; }
                 const touchX = getTouchX(e);
@@ -1079,9 +1116,7 @@
         });
 
         function gameLoop() {
-            // El loop se detiene visualmente si estamos en pause o gameover porque el HTML cubre el canvas
-            // pero mantenemos el dibujado básico
-            if (gameState !== 'MENU' && gameState !== 'SETTINGS' && gameState !== 'MUSIC_SELECT' && gameState !== 'INFO' && gameState !== 'STORE') { 
+            if (gameState !== 'MENU' && gameState !== 'SETTINGS' && gameState !== 'MUSIC_SELECT' && gameState !== 'INFO' && gameState !== 'STORE' && gameState !== 'RECORDS') { 
                 drawBackground(); 
                 if (gameState === 'PLAYING') update();
                 drawBag(); drawItems(); drawHUD();
