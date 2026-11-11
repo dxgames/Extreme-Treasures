@@ -44,7 +44,7 @@
 
         canvas { 
             border: 5px solid #00ffff; 
-            background-image: url('https://i.postimg.cc/Px2chqKH/Tablero.png'); 
+            background-image: url('https://i.postimg.cc/VLMLLtLS/tablero.jpg'); 
             background-size: cover; 
             background-repeat: no-repeat;
             background-position: center;
@@ -255,6 +255,8 @@
         .record-list li:nth-child(2) { color: #c0c0c0; font-weight: bold; font-size: 1.3em;}
         .record-list li:nth-child(3) { color: #cd7f32; font-weight: bold; font-size: 1.2em;}
 
+        /* Iconos de los objetos en "Cómo se juega" */
+        .item-icon { width: 28px; height: 28px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
     </style>
 </head>
 <body>
@@ -354,17 +356,17 @@
             <p>¡Bienvenido a Extreme Treasures! El objetivo es recolectar las riquezas y aumentar tu puntuación, mientras evitas las trampas.</p>
             <br>
             <h3>Items Comunes:</h3>
-            <p>💵 Billetes: Puntaje base (+20). Común.</p>
-            <p>🪙 Moneda de oro: Puntaje medio (+50). Raro.</p>
-            <p>💎 Diamante: ¡El tesoro más valioso! (+1000). Extremadamente raro.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/7ZhVvqNh/billetes.png" alt="💵"> Billetes: Puntaje base (+20). Común.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/sxJczX85/moneda.png" alt="🪙"> Moneda de oro: Puntaje medio (+50). Raro.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/sXYPPx3w/diamante.png" alt="💎"> Diamante: ¡El tesoro más valioso! (+1000). Extremadamente raro.</p>
             <p>💰 Saco de Monedas: Vale 100 Coins para la TIENDA. (Más frecuente).</p> 
             <p>❤️ Corazón: Restaura una vida (+1 HP).</p>
-            <p>💸 Dinero con alas: Resta puntos (-20).</p>
-            <p>💣 Bombas: Peligro. Resta una vida (-1 HP).</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/qRsccqpx/dineroconalas.png" alt="💸"> Dinero con alas: Resta puntos (-20).</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/TwMqWgvJ/bomba.png" alt="💣"> Bombas: Peligro. Resta una vida (-1 HP).</p>
             <br>
             <h3>Potenciadores y Trampas:</h3>
-            <p>⭐ Estrella (SÚPER FRENESÍ): Activa el modo Frenesí. Caen múltiples tesoros en cascada durante 10 segundos.</p>
-            <p>👹 Diablo (TRAMPA DEMONÍACA): Activa el modo Trampa. Caen múltiples bombas y dinero con alas en cascada durante 10 segundos.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/26QddyCv/frenesi.png" alt="⭐"> Estrella (SÚPER FRENESÍ): Activa el modo Frenesí. Caen múltiples tesoros en cascada durante 10 segundos.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/QtQggCj9/trampa.png" alt="👹"> Diablo (TRAMPA DEMONÍACA): Activa el modo Trampa. Caen múltiples bombas y dinero con alas en cascada durante 10 segundos.</p>
         </div>
         <button class="menu-button" style="margin-top: 20px;" onclick="showMainMenu()">Volver al menú</button>
     </div>
@@ -373,11 +375,12 @@
         <h2>Acerca del juego</h2>
         <div class="info-content">
             <p>Creado por DX GAMES</p>
-            <p><strong>Versión: v1.0.0</strong></p> 
+            <p><strong>Versión: v1.1.0</strong></p> 
             <br>
             
             <h3 style="color: #ffcc00; text-align: center; margin-bottom: 5px;">Registro de cambios</h3>
             <ul style="text-align: left; font-size: 0.95em; padding-left: 20px;">
+                <li>v1.1.0: Nuevos gráficos en todo el juego.</li>
                 <li>v1.0.0: Lanzamiento del juego.</li>
             </ul>
             
@@ -456,7 +459,7 @@
         bgmPlayer.volume = 0.3; 
         
         const MENU_BG_IMAGE_URL = 'https://i.postimg.cc/hjpwgGMQ/Fondo_menuprincipal.png';
-        const GAME_BG_IMAGE_URL = 'https://i.postimg.cc/TwCSGPQb/Fondo_juego.png';
+        const GAME_BG_IMAGE_URL = 'https://i.postimg.cc/Y2XG5YDW/fondo.jpg';
 
         // --- INICIO: SECCIÓN DE AJUSTES Y ESTADO GLOBAL ---
         let gameState = 'MENU'; 
@@ -540,7 +543,7 @@
             { id: 6, name: "Sin Música (🔇)", url: null, price: 0 }
         ];
         
-        const GAME_VERSION = "v1.0.0"; 
+        const GAME_VERSION = "v1.1.0"; 
 
         const soundToggleBtn = document.getElementById('sound-toggle');
         const vibrationToggleBtn = document.getElementById('vibration-toggle');
@@ -849,7 +852,9 @@
         
         // --- 1.5. Carga de Imagen de la Bolsa ---
         let bagImage = new Image();
-        const BAG_IMAGE_URL = 'https://i.postimg.cc/j5Z9KjvY/Bolsa.png';
+        let bagSprite = null; // la imagen ya reducida al tamaño del juego (null = todavía no carga)
+        const BAG_IMAGE_URL = 'https://i.postimg.cc/VN34B2n0/bolsa.png';
+        bagImage.onload = () => { if (bagImage.naturalWidth) bagSprite = makeSprite(bagImage, BAG_WIDTH, BAG_HEIGHT); };
         bagImage.src = BAG_IMAGE_URL; 
 
         // --- 2. Variables del Juego ---
@@ -881,18 +886,56 @@
 
         // --- 4. Tipos de Objetos ---
         const ITEM_TYPES = {
-            MONEY_NOTE: { emoji: '💵', value: 20, type: 'good', weight: 8 },
-            GOLD_COIN: { emoji: '🪙', value: 50, type: 'good', weight: 4 },
-            DIAMOND: { emoji: '💎', value: 1000, type: 'good', weight: 0.05 }, /* Diamante MUCHO más escaso */
+            MONEY_NOTE: { emoji: '💵', image: 'https://i.postimg.cc/7ZhVvqNh/billetes.png', value: 20, type: 'good', weight: 8 },
+            GOLD_COIN: { emoji: '🪙', image: 'https://i.postimg.cc/sxJczX85/moneda.png', value: 50, type: 'good', weight: 4 },
+            DIAMOND: { emoji: '💎', image: 'https://i.postimg.cc/sXYPPx3w/diamante.png', value: 1000, type: 'good', weight: 0.05 }, /* Diamante MUCHO más escaso */
             STORE_COIN: { emoji: '💰', value: 0, type: 'currency', weight: 0.4 }, /* Saco de monedas aumentado un poquito */
 
             HEART: { emoji: '❤️', value: 1, type: 'bonus', weight: 1 },
-            POWERUP_FRENZY: { emoji: '⭐', value: 0, type: 'powerup', weight: 0.2 }, 
-            TRAP_DEMON: { emoji: '👹', value: 0, type: 'trap', weight: 0.1 }, 
-            MONEY_WINGS: { emoji: '💸', value: -20, type: 'bad', weight: 3 }, 
-            BOMB: { emoji: '💣', value: -1, type: 'life_bad', weight: 3 } 
+            POWERUP_FRENZY: { emoji: '⭐', image: 'https://i.postimg.cc/26QddyCv/frenesi.png', value: 0, type: 'powerup', weight: 0.2 }, 
+            TRAP_DEMON: { emoji: '👹', image: 'https://i.postimg.cc/QtQggCj9/trampa.png', value: 0, type: 'trap', weight: 0.1 }, 
+            MONEY_WINGS: { emoji: '💸', image: 'https://i.postimg.cc/qRsccqpx/dineroconalas.png', value: -20, type: 'bad', weight: 3 }, 
+            BOMB: { emoji: '💣', image: 'https://i.postimg.cc/TwMqWgvJ/bomba.png', value: -1, type: 'life_bad', weight: 3 } 
         };
         const totalWeight = Object.values(ITEM_TYPES).reduce((sum, type) => sum + type.weight, 0);
+
+        // --- 4.1. Sprites de los objetos ---
+        // Reduce una imagen al tamaño del juego (conservando su proporción) una sola vez.
+        // Así dibujarla en cada cuadro es rápido y se ve nítida.
+        function makeSprite(img, maxW, maxH) {
+            const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+            const w = Math.max(1, Math.round(img.naturalWidth * scale));
+            const h = Math.max(1, Math.round(img.naturalHeight * scale));
+            let source = img, sw = img.naturalWidth, sh = img.naturalHeight;
+            // Si la imagen es muy grande se reduce a la mitad por pasos para que no se pixele
+            while (sw / 2 >= w && sh / 2 >= h) {
+                const step = document.createElement('canvas');
+                step.width = Math.round(sw / 2);
+                step.height = Math.round(sh / 2);
+                const sg = step.getContext('2d');
+                sg.imageSmoothingEnabled = true;
+                sg.imageSmoothingQuality = 'high';
+                sg.drawImage(source, 0, 0, step.width, step.height);
+                source = step; sw = step.width; sh = step.height;
+            }
+            const sprite = document.createElement('canvas');
+            sprite.width = w;
+            sprite.height = h;
+            const g = sprite.getContext('2d');
+            g.imageSmoothingEnabled = true;
+            g.imageSmoothingQuality = 'high';
+            g.drawImage(source, 0, 0, w, h);
+            return sprite;
+        }
+
+        // Cada objeto con imagen se dibuja con ella. Mientras no cargue (o si falla), se usa su emoji.
+        Object.keys(ITEM_TYPES).forEach(key => {
+            const type = ITEM_TYPES[key];
+            if (!type.image) return;
+            const img = new Image();
+            img.onload = () => { if (img.naturalWidth) type.sprite = makeSprite(img, ITEM_SIZE, ITEM_SIZE); };
+            img.src = type.image;
+        });
 
         let gameLoopId;
 
@@ -902,8 +945,11 @@
         function drawBag() {
             ctx.save();
             ctx.globalAlpha = 1.0; 
-            if (bagImage.complete && bagImage.naturalWidth !== 0) {
-                ctx.drawImage(bagImage, bag.x, bag.y, BAG_WIDTH, BAG_HEIGHT);
+            if (bagSprite) {
+                // Centrada y apoyada abajo dentro del cuadro de la bolsa
+                ctx.drawImage(bagSprite,
+                    Math.round(bag.x + (BAG_WIDTH - bagSprite.width) / 2),
+                    Math.round(bag.y + BAG_HEIGHT - bagSprite.height));
             } else {
                 ctx.font = `${BAG_WIDTH}px Arial`; ctx.textAlign = 'center';
                 ctx.fillText('💰', bag.x + BAG_WIDTH / 2, bag.y + BAG_HEIGHT - 5);
@@ -914,15 +960,25 @@
         function drawItems() {
             ctx.save(); 
             ctx.globalAlpha = 1.0; 
-            ctx.shadowColor = 'black'; 
-            ctx.shadowBlur = 5; 
             ctx.fillStyle = 'white'; 
-            
             ctx.font = `${ITEM_SIZE}px Arial`; 
             ctx.textAlign = 'center';
             
             items.forEach(item => {
-                ctx.fillText(item.type.emoji, item.x + ITEM_SIZE / 2, item.y + ITEM_SIZE - 5);
+                const sprite = item.type.sprite;
+                if (sprite) {
+                    // Imagen centrada en el cuadro del objeto
+                    ctx.drawImage(sprite,
+                        Math.round(item.x + (ITEM_SIZE - sprite.width) / 2),
+                        Math.round(item.y + (ITEM_SIZE - sprite.height) / 2));
+                } else {
+                    // Emoji (con sombra) para los objetos sin imagen o mientras carga
+                    ctx.shadowColor = 'black'; 
+                    ctx.shadowBlur = 5; 
+                    ctx.fillText(item.type.emoji, item.x + ITEM_SIZE / 2, item.y + ITEM_SIZE - 5);
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = 'transparent';
+                }
             });
             ctx.restore(); 
         }
