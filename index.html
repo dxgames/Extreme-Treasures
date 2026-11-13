@@ -272,7 +272,6 @@
         <h2>Menú Principal</h2>
         <div id="wallet-display">💰 Coins: 0</div>
         <button class="menu-button" onclick="showMusicSelectMenu()">Jugar</button> 
-        <button class="menu-button" onclick="showStoreMenu()">Tienda</button>
         <button class="menu-button" onclick="showRecordsMenu()">Récords</button>
         <button class="menu-button" onclick="showSettings()">Ajustes</button>
         <button class="menu-button" onclick="showHowToPlayMenu()">Como se juega</button>
@@ -356,12 +355,12 @@
             <p>¡Bienvenido a Extreme Treasures! El objetivo es recolectar las riquezas y aumentar tu puntuación, mientras evitas las trampas.</p>
             <br>
             <h3>Items Comunes:</h3>
-            <p><img class="item-icon" src="https://i.postimg.cc/7ZhVvqNh/billetes.png" alt="💵"> Billetes: Puntaje base (+20). Común.</p>
-            <p><img class="item-icon" src="https://i.postimg.cc/sxJczX85/moneda.png" alt="🪙"> Moneda de oro: Puntaje medio (+50). Raro.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/7ZhVvqNh/billetes.png" alt="💵"> Billetes: Puntaje medio (+50). Común.</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/sxJczX85/moneda.png" alt="🪙"> Moneda de oro: Puntaje base (+20). Raro.</p>
             <p><img class="item-icon" src="https://i.postimg.cc/sXYPPx3w/diamante.png" alt="💎"> Diamante: ¡El tesoro más valioso! (+1000). Extremadamente raro.</p>
             <p>💰 Saco de Monedas: Vale 100 Coins para la TIENDA. (Más frecuente).</p> 
             <p>❤️ Corazón: Restaura una vida (+1 HP).</p>
-            <p><img class="item-icon" src="https://i.postimg.cc/qRsccqpx/dineroconalas.png" alt="💸"> Dinero con alas: Resta puntos (-20).</p>
+            <p><img class="item-icon" src="https://i.postimg.cc/qRsccqpx/dineroconalas.png" alt="💸"> Dinero con alas: Resta puntos (-50).</p>
             <p><img class="item-icon" src="https://i.postimg.cc/TwMqWgvJ/bomba.png" alt="💣"> Bombas: Peligro. Resta una vida (-1 HP).</p>
             <br>
             <h3>Potenciadores y Trampas:</h3>
@@ -458,13 +457,14 @@
         const bgmPlayer = document.getElementById('bgm-player');
         bgmPlayer.volume = 0.3; 
         
-        const MENU_BG_IMAGE_URL = 'https://i.postimg.cc/hjpwgGMQ/Fondo_menuprincipal.png';
+        const MENU_BG_IMAGE_URL = 'https://i.postimg.cc/Y2XG5YDW/fondo.jpg'; // Misma imagen que el fondo del juego
         const GAME_BG_IMAGE_URL = 'https://i.postimg.cc/Y2XG5YDW/fondo.jpg';
 
         // --- INICIO: SECCIÓN DE AJUSTES Y ESTADO GLOBAL ---
         let gameState = 'MENU'; 
         let audioStarted = false; 
-        let highScore = 0; 
+        let highScore = 0; // Récord personal que se muestra en pantalla
+        let personalRecord = 0; 
         let topRecords = [50000, 30000, 15000, 0, 0, 0, 0, 0];
         
         // --- SISTEMA DE ECONOMÍA ---
@@ -477,19 +477,28 @@
             const storedRecords = localStorage.getItem('dxGamesRecords');
             if (storedRecords) {
                 topRecords = JSON.parse(storedRecords);
-                highScore = topRecords[0];
             } else {
                 const legacyScore = localStorage.getItem('extremeTreasuresHighScore');
                 if (legacyScore) {
                     topRecords.push(parseInt(legacyScore, 10));
                     topRecords.sort((a,b) => b - a);
                     topRecords = topRecords.slice(0, 8);
-                    highScore = topRecords[0];
-                } else {
-                    highScore = topRecords[0];
                 }
             }
-            highScoreDisplay.textContent = `Récord: ${highScore}`;
+            // Récord personal: solo tus puntos, nunca el más alto de la lista de récords a superar.
+            const storedPersonal = localStorage.getItem('dxGamesPersonalRecord');
+            if (storedPersonal !== null) {
+                personalRecord = parseInt(storedPersonal, 10) || 0;
+            } else {
+                // Migración una sola vez: tu mejor puntuación real es la más alta de la
+                // lista guardada sin contar los récords iniciales (50000, 30000 y 15000).
+                const DEFAULT_RECORDS = [50000, 30000, 15000];
+                const ownScores = topRecords.filter(s => !DEFAULT_RECORDS.includes(s));
+                personalRecord = ownScores.length ? Math.max(...ownScores) : 0;
+                localStorage.setItem('dxGamesPersonalRecord', personalRecord.toString());
+            }
+            highScore = personalRecord;
+            highScoreDisplay.textContent = `Récord personal: ${highScore}`;
 
             const storedSettings = localStorage.getItem('dxGamesSettings');
             if(storedSettings) {
@@ -527,7 +536,12 @@
             topRecords.sort((a,b) => b - a);
             topRecords = topRecords.slice(0, 8);
             localStorage.setItem('dxGamesRecords', JSON.stringify(topRecords));
-            highScore = topRecords[0];
+            // El récord que se muestra es el personal, no el más alto de la lista.
+            if (score > personalRecord) {
+                personalRecord = score;
+                localStorage.setItem('dxGamesPersonalRecord', personalRecord.toString());
+            }
+            highScore = personalRecord;
             localStorage.setItem('extremeTreasuresHighScore', highScore.toString());
         }
 
@@ -886,15 +900,15 @@
 
         // --- 4. Tipos de Objetos ---
         const ITEM_TYPES = {
-            MONEY_NOTE: { emoji: '💵', image: 'https://i.postimg.cc/7ZhVvqNh/billetes.png', value: 20, type: 'good', weight: 8 },
-            GOLD_COIN: { emoji: '🪙', image: 'https://i.postimg.cc/sxJczX85/moneda.png', value: 50, type: 'good', weight: 4 },
+            MONEY_NOTE: { emoji: '💵', image: 'https://i.postimg.cc/7ZhVvqNh/billetes.png', value: 50, type: 'good', weight: 8 },
+            GOLD_COIN: { emoji: '🪙', image: 'https://i.postimg.cc/sxJczX85/moneda.png', value: 20, type: 'good', weight: 4 },
             DIAMOND: { emoji: '💎', image: 'https://i.postimg.cc/sXYPPx3w/diamante.png', value: 1000, type: 'good', weight: 0.05 }, /* Diamante MUCHO más escaso */
             STORE_COIN: { emoji: '💰', value: 0, type: 'currency', weight: 0.4 }, /* Saco de monedas aumentado un poquito */
 
-            HEART: { emoji: '❤️', value: 1, type: 'bonus', weight: 1 },
+            HEART: { emoji: '❤️', value: 1, type: 'bonus', weight: 0.6 },
             POWERUP_FRENZY: { emoji: '⭐', image: 'https://i.postimg.cc/26QddyCv/frenesi.png', value: 0, type: 'powerup', weight: 0.2 }, 
             TRAP_DEMON: { emoji: '👹', image: 'https://i.postimg.cc/QtQggCj9/trampa.png', value: 0, type: 'trap', weight: 0.1 }, 
-            MONEY_WINGS: { emoji: '💸', image: 'https://i.postimg.cc/qRsccqpx/dineroconalas.png', value: -20, type: 'bad', weight: 3 }, 
+            MONEY_WINGS: { emoji: '💸', image: 'https://i.postimg.cc/qRsccqpx/dineroconalas.png', value: -50, type: 'bad', weight: 3 }, 
             BOMB: { emoji: '💣', image: 'https://i.postimg.cc/TwMqWgvJ/bomba.png', value: -1, type: 'life_bad', weight: 3 } 
         };
         const totalWeight = Object.values(ITEM_TYPES).reduce((sum, type) => sum + type.weight, 0);
@@ -1043,31 +1057,37 @@
                 bag.y < objB.y + ITEM_SIZE && bag.y + BAG_HEIGHT > objB.y;
         }
 
+        // Elige un tipo según los pesos. Si la vida está llena, el corazón no entra en el sorteo.
+        function pickWeighted(weights) {
+            const entries = Object.entries(weights).filter(([key, w]) => {
+                if (key === 'HEART' && bag.life >= MAX_LIFE) return false;
+                return w > 0;
+            });
+            const total = entries.reduce((sum, [, w]) => sum + w, 0);
+            if (total <= 0) return null;
+            let randomNum = Math.random() * total;
+            for (const [key, w] of entries) {
+                randomNum -= w;
+                if (randomNum <= 0) return ITEM_TYPES[key];
+            }
+            return ITEM_TYPES[entries[entries.length - 1][0]];
+        }
+
         function spawnItem(isCascade = false) {
             let typeToSpawn;
             if (isFrenzyActive) {
                 // Frenesí: Pesos ajustados para que el diamante sea súper escaso y aparezcan más monedas/billetes/sacos
-                const frenzyWeights = { GOLD_COIN: 6, MONEY_NOTE: 6, STORE_COIN: 0.8, DIAMOND: 0.1, HEART: 1 }; 
-                let randomNum = Math.random() * Object.values(frenzyWeights).reduce((a, b) => a + b, 0);
-                for (const key in frenzyWeights) {
-                    randomNum -= frenzyWeights[key];
-                    if (randomNum <= 0) { typeToSpawn = ITEM_TYPES[key]; break; }
-                }
+                const frenzyWeights = { GOLD_COIN: 6, MONEY_NOTE: 6, STORE_COIN: 0.8, DIAMOND: 0.1, HEART: 0.6 };
+                typeToSpawn = pickWeighted(frenzyWeights);
             } else if (isTrapActive) {
-                const trapWeights = { BOMB: 10, MONEY_WINGS: 5 };
-                let randomNum = Math.random() * Object.values(trapWeights).reduce((a, b) => a + b, 0);
-                for (const key in trapWeights) {
-                    randomNum -= trapWeights[key];
-                    if (randomNum <= 0) { typeToSpawn = ITEM_TYPES[key]; break; }
-                }
+                const trapWeights = { BOMB: 2, MONEY_WINGS: 5 };
+                typeToSpawn = pickWeighted(trapWeights);
             } else {
-                let randomNum = Math.random() * totalWeight;
-                for (const key in ITEM_TYPES) {
-                    randomNum -= ITEM_TYPES[key].weight;
-                    if (randomNum <= 0) { typeToSpawn = ITEM_TYPES[key]; break; }
-                }
+                const normalWeights = {};
+                for (const key in ITEM_TYPES) normalWeights[key] = ITEM_TYPES[key].weight;
+                typeToSpawn = pickWeighted(normalWeights);
             }
-            if (!typeToSpawn) return; 
+            if (!typeToSpawn) return;
 
             const x = Math.random() * (GAME_WIDTH - ITEM_SIZE);
             const { minSpeed, maxSpeed } = calculateSpeed();
